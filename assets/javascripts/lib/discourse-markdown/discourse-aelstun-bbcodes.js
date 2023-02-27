@@ -46,6 +46,10 @@ function setupMarkdownIt(md){
 export function setup(helper) {
     if(!helper.markdownIt) { return; }
 
+    helper.registerOptions((opts, siteSettings) => {
+        opts.features["aelstun-bbcodes"] = !!siteSettings.enable_aelstun_bbcodes;
+    });
+
     helper.allowList([
         'div.af-box'
     ]);
