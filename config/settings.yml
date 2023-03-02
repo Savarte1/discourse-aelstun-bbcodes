@@ -1,4 +1,0 @@
-plugins:
-  enable_aelstun_bbcodes:
-    default: true
-    client: true

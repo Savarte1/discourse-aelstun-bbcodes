@@ -10,7 +10,7 @@ function setupMarkdownIt(md){
     inline_ruler.push('nation', {
         tag: 'nation',
         wrap: function(startToken, endToken, tagInfo, content) {
-           const url = (tagInfo.attrs['_default'] || content).trim();
+           const url = (content).trim();
            startToken.type = 'link_open';
            startToken.tag = 'a';
            startToken.attrs = [['href', 'https://www.nationstates.net/nation=' + url], ['data-bbcode', 'true']];
@@ -22,12 +22,12 @@ function setupMarkdownIt(md){
            endToken.content = '';
            endToken.nesting = -1;
         }
-     });
+    });
 
-     inline_ruler.push('region', {
+    inline_ruler.push('region', {
         tag: 'region',
         wrap: function(startToken, endToken, tagInfo, content) {
-           const url = (tagInfo.attrs['_default'] || content).trim();
+           const url = (content).trim();
            startToken.type = 'link_open';
            startToken.tag = 'a';
            startToken.attrs = [['href', 'https://www.nationstates.net/region=' + url], ['data-bbcode', 'true']];
@@ -39,19 +39,45 @@ function setupMarkdownIt(md){
            endToken.content = '';
            endToken.nesting = -1;
         }
-     });
+    });
+
+    inline_ruler.push('align', {
+        tag: 'align',
+        wrap: function(startToken, endToken, tagInfo) {
+            const align = (tagInfo.attrs['_default']).trim();
+            startToken.type = 'align_open';
+            startToken.tag = 'div';
+            startToken.attrs = [["style", "text-align:" + align]];
+            startToken.content = '';
+            startToken.nesting = 1;
+
+            endToken.type = 'align_close';
+            endToken.tag = 'div';
+            endToken.content = '';
+            endToken.nesting = -1;
+        }
+    });
+
+    md.core.textPostProcess.ruler.push('hr', {
+        matcher: /(\[hr\])/,
+        onMatch: function(buffer, matches, state) {
+            let token = new state.Token('hr_inline', 'hr', 0);
+            buffer.push(token);
+        }
+    });
 
 }
 
 export function setup(helper) {
     if(!helper.markdownIt) { return; }
 
-    helper.registerOptions((opts, siteSettings) => {
-        opts.features["aelstun-bbcodes"] = !!siteSettings.enable_aelstun_bbcodes;
+    helper.registerOptions((opts) => {
+        opts.features["aelstun-bbcodes"] = true;
     });
 
     helper.allowList([
-        'div.af-box'
+        'div.af-box',
+        'hr',
     ]);
 
     helper.registerPlugin(setupMarkdownIt);
